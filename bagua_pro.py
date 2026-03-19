@@ -83,7 +83,11 @@ if st.button("🔮 開始感應起卦", use_container_width=True):
             advice = f"多爻發動（第 {moving_str} 爻），請綜合參考本卦與變卦【{changed_name}】。"
 
         st.write(f"💡 **建議**：{advice}")
+        # --- 組合文字框供複製 ---
+        copy_text = f"{q_text}☯️ 占卜結果：\n本卦：{base_name}\n變卦：{changed_name if moving_lines else '無'}\n啟示：{advice}\n---"
+        st.text_area("📋 複製占卜結果：", value=copy_text, height=120)
         
         # 6. 提供搜尋按鈕 (代替 webbrowser.open)
         google_url = f"https://www.google.com/search?q={urllib.parse.quote(search_query)}"
         st.link_button("👉 查看深度解析 (Google)", google_url)
+st.caption("提示：占卜結果僅供參考，請保持平常心。")
