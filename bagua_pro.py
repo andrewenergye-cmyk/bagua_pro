@@ -2,7 +2,10 @@ import streamlit as st
 import random
 import urllib.parse
 
-# 易經 64 卦對照表 (保持不變)
+# 設定網頁標題與圖示 (手機瀏覽器分頁會顯示)
+st.set_page_config(page_title="易經占卜", page_icon="☯️")
+
+# 易經 64 卦對照表
 HEXAGRAMS = {
     "111111": "乾為天", "000000": "坤為地", "100010": "水雷屯", "010001": "山水蒙",
     "111010": "水天需", "010111": "天水訟", "010000": "地水師", "000010": "水地比",
@@ -23,23 +26,25 @@ HEXAGRAMS = {
 }
 
 def toss_coins():
+    """模擬擲三枚硬幣"""
     return sum(random.choice([2, 3]) for _ in range(3))
 
-# Streamlit 網頁標題
-st.set_page_config(page_title="易經占卜系統", page_icon="☯️")
-st.title("☯️ 易經金錢卦智慧占卜")
+# --- 網頁介面開始 ---
+st.title("☯️ 易經金錢卦智慧占卜-by 臣")
+st.markdown("---")
 
 # 1. 輸入問題
-question = st.text_input("請在心中默念您的問題後輸入：", placeholder="例如：這週的面試運勢？")
+question = st.text_input("請在心中默念您的問題：", placeholder="例如：問本週事業運勢？")
 
-if st.button("開始起卦"):
-    with st.spinner('正在冥想感應，模擬擲幣中...'):
+# 2. 按鈕觸發
+if st.button("🔮 開始感應起卦", use_container_width=True):
+    with st.spinner('正在與天地感應，模擬擲幣中...'):
         base_binary = ""
         changed_binary = ""
         moving_lines = []
         visual_lines = []
         
-        # 2. 演算六爻
+        # 演算六爻 (從初爻到上爻)
         for i in range(1, 7):
             score = toss_coins()
             if score == 6:  # 老陰
@@ -57,19 +62,24 @@ if st.button("開始起卦"):
                 moving_lines.append(i)
                 visual_lines.append(f"第 {i} 爻: ━━━  ○ (老陽動)")
 
-        # 3. 獲取卦名
+        # 取得卦名
         base_name = HEXAGRAMS[base_binary]
         changed_name = HEXAGRAMS[changed_binary]
         
-        # 4. 顯示卦象圖
-        st.subheader("【 卦象結果 】")
+        # 顯示結果
+        st.subheader("【 卦象顯現 】")
+        # 顯示卦圖 (從上爻到初爻)
         for line in reversed(visual_lines):
             st.code(line)
         
-        st.success(f"✨ 本卦：**{base_name}**")
-        st.info(f"✨ 變卦：**{changed_name if moving_lines else '無'}**")
+        # 結果文字卡片
+        col1, col2 = st.columns(2)
+        with col1:
+            st.success(f"**本卦**\n\n{base_name}")
+        with col2:
+            st.info(f"**變卦**\n\n{changed_name if moving_lines else '無'}")
         
-        # 5. 解卦建議
+        # 解卦邏輯
         q_prefix = f"{question} " if question else ""
         if not moving_lines:
             search_query = f"{q_prefix}易經 {base_name} 卦象解釋"
@@ -82,8 +92,11 @@ if st.button("開始起卦"):
             search_query = f"{q_prefix}易經 {base_name} 變 {changed_name} 卦象解釋"
             advice = f"多爻發動（第 {moving_str} 爻），請綜合參考本卦與變卦【{changed_name}】。"
 
-        st.write(f"💡 **建議**：{advice}")
+        st.warning(f"💡 **啟示**：{advice}")
         
-        # 6. 提供搜尋按鈕 (代替 webbrowser.open)
+        # 搜尋按鈕
+        st.divider()
         google_url = f"https://www.google.com/search?q={urllib.parse.quote(search_query)}"
-        st.link_button("👉 查看深度解析 (Google)", google_url)
+        st.link_button("👉 點此查看深度解析 (Google)", google_url, use_container_width=True)
+
+st.caption("建議：占卜僅供參考，心誠則靈。")
