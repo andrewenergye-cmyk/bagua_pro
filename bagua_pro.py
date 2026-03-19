@@ -27,7 +27,7 @@ def toss_coins():
 
 # Streamlit 網頁標題
 st.set_page_config(page_title="易經占卜系統", page_icon="☯️")
-st.title("☯️ 易經金錢卦智慧占卜")
+st.title("☯️ 易經金錢卦智慧占卜-BY 臣")
 
 # 1. 輸入問題
 question = st.text_input("請在心中默念您的問題後輸入：", placeholder="例如：這週的面試運勢？")
