@@ -67,7 +67,7 @@ st.markdown("""
 st.title("☯️ 易經智慧占卜 - BY 臣")
 
 # 1. 輸入問題
-question = st.text_input("🔮 請在心中默念您的問題：", placeholder="例如：問本週事業運勢？")
+question = st.text_input("🔮 請在心中默念並輸入您的問題：", placeholder="例如：問本週事業運勢？")
 
 # 2. 開始起卦
 if st.button("🔮 開始感應起卦", use_container_width=True):
