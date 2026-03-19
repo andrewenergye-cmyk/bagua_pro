@@ -30,9 +30,9 @@ st.set_page_config(page_title="易經占卜系統", page_icon="☯️")
 st.title("☯️ 易經金錢卦智慧占卜-BY 臣")
 
 # 1. 輸入問題
-question = st.text_input("請在心中默念您的問題後輸入：", placeholder="例如：這週的面試運勢？")
+question = st.text_input("請在心中默念您的問題後輸入：", placeholder="例如：問本週事業運勢？")
 
-if st.button("🔮 開始感應起卦", use_container_width=True)
+if st.button("🔮 開始感應起卦", use_container_width=True):
     with st.spinner('正在與天地感應，模擬擲幣中...'):
         base_binary = ""
         changed_binary = ""
