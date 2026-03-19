@@ -1,9 +1,8 @@
-﻿import random
-import webbrowser
+import streamlit as st
+import random
 import urllib.parse
-import time
 
-# 易經 64 卦二進位對照表 (0:陰, 1:陽，由初爻到上爻)
+# 易經 64 卦對照表 (保持不變)
 HEXAGRAMS = {
     "111111": "乾為天", "000000": "坤為地", "100010": "水雷屯", "010001": "山水蒙",
     "111010": "水天需", "010111": "天水訟", "010000": "地水師", "000010": "水地比",
@@ -24,81 +23,67 @@ HEXAGRAMS = {
 }
 
 def toss_coins():
-    """模擬擲三枚硬幣，3為正(陽)，2為反(陰)"""
-    # 6: 老陰, 7: 少陽, 8: 少陰, 9: 老陽
     return sum(random.choice([2, 3]) for _ in range(3))
 
-def divination_app():
-    print("=" * 50)
-    print(" ☯️  易經金錢卦智慧占卜系統 (專業整合版)  ☯️ ")
-    print("=" * 50)
-    
-    # 1. 輸入問題
-    question = input("\n請在心中默念您的問題後輸入（或直接按 Enter）：").strip()
-    
-    print("\n正在冥想感應，模擬擲幣起卦中...")
-    time.sleep(1.5)
-    
-    base_binary = ""
-    changed_binary = ""
-    moving_lines = []
-    visual_lines = []
-    
-    # 2. 演算六爻 (從初爻到上爻)
-    for i in range(1, 7):
-        score = toss_coins()
-        if score == 6:   # 老陰 (X) -> 變陽
-            base_binary += "0"; changed_binary += "1"
-            moving_lines.append(i)
-            visual_lines.append(f"第 {i} 爻: ━  ━  × (老陰動)")
-        elif score == 7: # 少陽 (—) -> 不變
-            base_binary += "1"; changed_binary += "1"
-            visual_lines.append(f"第 {i} 爻: ━━━    (少陽靜)")
-        elif score == 8: # 少陰 (- -) -> 不變
-            base_binary += "0"; changed_binary += "0"
-            visual_lines.append(f"第 {i} 爻: ━  ━    (少陰靜)")
-        elif score == 9: # 老陽 (O) -> 變陰
-            base_binary += "1"; changed_binary += "0"
-            moving_lines.append(i)
-            visual_lines.append(f"第 {i} 爻: ━━━  ○ (老陽動)")
+# Streamlit 網頁標題
+st.set_page_config(page_title="易經占卜系統", page_icon="☯️")
+st.title("☯️ 易經金錢卦智慧占卜")
 
-    # 3. 獲取卦名
-    base_name = HEXAGRAMS[base_binary]
-    changed_name = HEXAGRAMS[changed_binary]
-    
-    # 4. 顯示結果介面
-    print("\n" + "-"*20 + " 卦象圖 " + "-"*20)
-    for line in reversed(visual_lines): # 從上爻印到初爻
-        print(line)
-    print("-" * 48)
-    
-    print(f"\n✨ 本卦：【 {base_name} 】")
-    
-    # 5. 組合搜尋邏輯與解卦建議
-    q_prefix = f"{question} " if question else ""
-    
-    if not moving_lines:
-        search_query = f"{q_prefix}易經 {base_name} 卦象解釋"
-        advice = "六爻皆靜，請參考「本卦」的整體卦辭。"
-    elif len(moving_lines) == 1:
-        search_query = f"{q_prefix}易經 {base_name} 動第{moving_lines[0]}爻 變 {changed_name}"
-        advice = f"有一動爻，重點參考「本卦」第 {moving_lines[0]} 爻的爻辭。"
-    else:
-        moving_str = ",".join(map(str, moving_lines))
-        search_query = f"{q_prefix}易經 {base_name} 變 {changed_name} 卦象解釋"
-        advice = f"多爻發動（第 {moving_str} 爻），請綜合參考本卦與變卦【{changed_name}】。"
+# 1. 輸入問題
+question = st.text_input("請在心中默念您的問題後輸入：", placeholder="例如：這週的面試運勢？")
 
-    print(f"✨ 變卦：【 {changed_name if moving_lines else '無'} 】")
-    print(f"💡 建議：{advice}")
-    
-    # 6. 開啟瀏覽器
-    print("\n正在為您導航至 Google 搜尋深度解析...")
-    google_url = f"https://www.google.com/search?q={urllib.parse.quote(search_query)}"
-    time.sleep(1)
-    webbrowser.open(google_url)
-    
-    print("\n" + "=" * 50)
-    input("按 Enter 鍵即可結束程式...")
+if st.button("開始起卦"):
+    with st.spinner('正在冥想感應，模擬擲幣中...'):
+        base_binary = ""
+        changed_binary = ""
+        moving_lines = []
+        visual_lines = []
+        
+        # 2. 演算六爻
+        for i in range(1, 7):
+            score = toss_coins()
+            if score == 6:  # 老陰
+                base_binary += "0"; changed_binary += "1"
+                moving_lines.append(i)
+                visual_lines.append(f"第 {i} 爻: ━  ━  × (老陰動)")
+            elif score == 7: # 少陽
+                base_binary += "1"; changed_binary += "1"
+                visual_lines.append(f"第 {i} 爻: ━━━    (少陽靜)")
+            elif score == 8: # 少陰
+                base_binary += "0"; changed_binary += "0"
+                visual_lines.append(f"第 {i} 爻: ━  ━    (少陰靜)")
+            elif score == 9: # 老陽
+                base_binary += "1"; changed_binary += "0"
+                moving_lines.append(i)
+                visual_lines.append(f"第 {i} 爻: ━━━  ○ (老陽動)")
 
-if __name__ == "__main__":
-    divination_app()
+        # 3. 獲取卦名
+        base_name = HEXAGRAMS[base_binary]
+        changed_name = HEXAGRAMS[changed_binary]
+        
+        # 4. 顯示卦象圖
+        st.subheader("【 卦象結果 】")
+        for line in reversed(visual_lines):
+            st.code(line)
+        
+        st.success(f"✨ 本卦：**{base_name}**")
+        st.info(f"✨ 變卦：**{changed_name if moving_lines else '無'}**")
+        
+        # 5. 解卦建議
+        q_prefix = f"{question} " if question else ""
+        if not moving_lines:
+            search_query = f"{q_prefix}易經 {base_name} 卦象解釋"
+            advice = "六爻皆靜，請參考「本卦」的整體卦辭。"
+        elif len(moving_lines) == 1:
+            search_query = f"{q_prefix}易經 {base_name} 動第{moving_lines[0]}爻 變 {changed_name}"
+            advice = f"有一動爻，重點參考「本卦」第 {moving_lines[0]} 爻的爻辭。"
+        else:
+            moving_str = ",".join(map(str, moving_lines))
+            search_query = f"{q_prefix}易經 {base_name} 變 {changed_name} 卦象解釋"
+            advice = f"多爻發動（第 {moving_str} 爻），請綜合參考本卦與變卦【{changed_name}】。"
+
+        st.write(f"💡 **建議**：{advice}")
+        
+        # 6. 提供搜尋按鈕 (代替 webbrowser.open)
+        google_url = f"https://www.google.com/search?q={urllib.parse.quote(search_query)}"
+        st.link_button("👉 查看深度解析 (Google)", google_url)
